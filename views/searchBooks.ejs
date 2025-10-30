@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - Share Reads</title>
+    <script src="https://kit.fontawesome.com/b795da5b50.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/dashboard-modern.css">
+    <link rel="icon" href="images/book.png" type="image/png">
+</head>
+<body>
+    <!-- Modern Navigation Header -->
+    <header class="modern-header">
+        <nav class="nav-container">
+            <a href="/dashboard" class="nav-logo">
+                <img src="images/Share Reads .png" alt="Share Reads Logo">
+            </a>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="/dashboard"><i class="fa-solid fa-home"></i> Home</a></li>
+                <li><a href="/profileInfo"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li><a href="/booklist"><i class="fa-solid fa-book"></i> My Books</a></li>
+                <li><a href="/notifications"><i class="fa-solid fa-bell"></i> Notifications</a></li>
+                <li><a href="/" style="color: #ff9a9e;"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="dashboard-hero">
+        <div class="hero-badge">
+            <i class="fa-solid fa-magnifying-glass"></i> Search Results
+        </div>
+        <h1 class="hero-title">Results for "<%= query %>"</h1>
+        <p class="hero-subtitle">Found <%= books.length %> book<%= books.length !== 1 ? 's' : '' %> matching your search</p>
+    </section>
+
+    <!-- Search Section -->
+    <section class="search-section">
+        <form action="/searchBooks" method="GET" class="search-container">
+            <input type="text" name="query" value="<%= query %>" placeholder="Search for books, authors, or genres..." required>
+            <button type="submit">
+                <i class="fa-solid fa-search"></i> Search
+            </button>
+        </form>
+    </section>
+
+    <!-- Books Grid Section -->
+    <% if (books.length > 0) { %>
+        <section class="books-section">
+            <div class="books-grid">
+                <% books.forEach(function(book) { %> 
+                    <div class="book-card">
+                        <div class="book-card-image-wrapper">
+                            <img src="<%= book.bookImage %>" alt="<%= book.title %>" class="book-card-image">
+                            <div class="book-card-badge">
+                                <i class="fa-solid fa-star"></i> Available
+                            </div>
+                        </div>
+                        <div class="book-card-content">
+                            <h2 class="book-card-title"><%= book.title %></h2>
+                            <p class="book-card-author">by <%= book.author %></p>
+                            
+                            <div class="book-card-details">
+                                <div class="book-card-detail">
+                                    <i class="fa-solid fa-user"></i>
+                                    <span><%= book.userId.name %></span>
+                                </div>
+                                <div class="book-card-detail">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    <span><%= book.userId.division %></span>
+                                </div>
+                            </div>
+
+                            <div class="book-card-actions">
+                                <button class="btn-view" onclick="openBookModal('<%= book.userId.username %>', '<%= book._id %>')">
+                                    <i class="fa-solid fa-eye"></i> View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <% if (currentPage > 1) { %>
+                    <a href="/searchBooks?query=<%= query %>&page=<%= currentPage - 1 %>" class="pagination-btn">
+                        <i class="fa-solid fa-arrow-left"></i> Previous
+                    </a>
+                <% } %>
+                
+                <div class="pagination-info">
+                    Page <%= currentPage %> of <%= totalPages %>
+                </div>
+                
+                <% if (currentPage < totalPages) { %>
+                    <a href="/searchBooks?query=<%= query %>&page=<%= currentPage + 1 %>" class="pagination-btn">
+                        Next <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                <% } %>
+            </div>
+        </section>
+    <% } else { %>
+        <section class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <h2 class="empty-state-title">No books found</h2>
+            <p class="empty-state-text">We couldn't find any books matching "<%= query %>". Try a different search term.</p>
+        </section>
+    <% } %>
+
+    <%- include('partials/modern-footer') %>
+
+    <!-- Book Details Modal -->
+    <div class="book-modal-overlay" id="bookModal">
+        <div class="book-modal">
+            <button class="book-modal-close" onclick="closeBookModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="modalContent" class="book-modal-loading">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Loading...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu').addEventListener('click', function () {
+            this.classList.toggle('active');
+            document.getElementById('nav-menu').classList.toggle('active');
+        });
+
+        // Book Modal Functions
+        async function openBookModal(username, bookId) {
+            const modal = document.getElementById('bookModal');
+            const content = document.getElementById('modalContent');
+            
+            // Add a state to history so back button can close modal
+            history.pushState({ modalOpen: true }, '');
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            content.innerHTML = '<div class="book-modal-loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading...</div>';
+            
+            try {
+                const response = await fetch(`/api/book-details?username=${username}&bookId=${bookId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    content.innerHTML = generateModalContent(data);
+                } else {
+                    content.innerHTML = '<div class="book-modal-loading">Error loading book details</div>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                content.innerHTML = '<div class="book-modal-loading">Error loading book details</div>';
+            }
+        }
+
+        function closeBookModal() {
+            const modal = document.getElementById('bookModal');
+            if (modal.classList.contains('active')) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                
+                // Remove the modal state from history if it exists
+                if (history.state && history.state.modalOpen) {
+                    history.back();
+                }
+            }
+        }
+
+        // Handle browser back button
+        window.addEventListener('popstate', function(event) {
+            const modal = document.getElementById('bookModal');
+            if (modal.classList.contains('active')) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Close modal on overlay click
+        document.getElementById('bookModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeBookModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeBookModal();
+            }
+        });
+
+        function generateModalContent(data) {
+            const { book, user, requestExists } = data;
+            const stars = generateStars(book.rating);
+            
+            return `
+                <div class="book-modal-content">
+                    <div class="book-modal-left">
+                        <img src="${book.bookImage}" alt="${book.title}" class="book-modal-cover">
+                        <h2 class="book-modal-title">${book.title}</h2>
+                        <p class="book-modal-author">by ${book.author}</p>
+                        <div class="book-modal-tags">
+                            <span class="book-tag"><i class="fa-solid fa-book"></i> Available</span>
+                        </div>
+                    </div>
+                    
+                    <div class="book-modal-right">
+                        <div class="book-modal-section">
+                            <h3 class="book-modal-section-title">
+                                <i class="fa-solid fa-quote-left"></i> Review
+                            </h3>
+                            <div class="book-modal-review">
+                                ${book.review}
+                            </div>
+                        </div>
+                        
+                        <div class="book-modal-section">
+                            <h3 class="book-modal-section-title">
+                                <i class="fa-solid fa-star"></i> Rating
+                            </h3>
+                            <div class="book-modal-rating">
+                                <div class="book-modal-stars">${stars}</div>
+                                <span class="book-modal-rating-text">${book.rating} / 5</span>
+                            </div>
+                        </div>
+                        
+                        <div class="book-modal-section">
+                            <h3 class="book-modal-section-title">
+                                <i class="fa-solid fa-user"></i> Book Owner
+                            </h3>
+                            <div class="book-modal-owner">
+                                <div class="owner-header">
+                                    <img src="${user.profileImage || '/images/user.png'}" alt="${user.name}" class="owner-avatar">
+                                    <div class="owner-info">
+                                        <h3>${user.name}</h3>
+                                        <p>@${user.username}</p>
+                                    </div>
+                                </div>
+                                <div class="owner-details">
+                                    <div class="owner-detail-item">
+                                        <i class="fa-solid fa-map"></i>
+                                        <span>${user.division}</span>
+                                    </div>
+                                    <div class="owner-detail-item">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        <span>${user.address}</span>
+                                    </div>
+                                    <div style="margin-top: 16px; padding: 16px; background: linear-gradient(135deg, rgba(255, 236, 210, 0.5) 0%, rgba(212, 165, 217, 0.3) 100%); border-radius: 12px; border: 2px dashed rgba(139, 127, 199, 0.3);">
+                                        <div style="display: flex; align-items: center; gap: 10px; color: #8b7fc7; font-weight: 600; font-size: 13px;">
+                                            <i class="fa-solid fa-info-circle" style="font-size: 16px;"></i>
+                                            <p style="margin: 0; line-height: 1.5;">
+                                                Send request to get contact info (Email & Phone)
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="book-modal-actions">
+                            <form action="/sendRequest" method="POST" onsubmit="handleRequestSubmit(event)">
+                                <input type="hidden" name="toUserId" value="${user._id}">
+                                <input type="hidden" name="bookId" value="${book._id}">
+                                <button type="submit" class="btn-modal-request ${requestExists ? 'cancel' : ''}">
+                                    ${requestExists 
+                                        ? '<i class="fa-solid fa-times"></i> Cancel Request' 
+                                        : '<i class="fa-solid fa-paper-plane"></i> Send Request'}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateStars(rating) {
+            let stars = '';
+            for (let i = 0; i < 5; i++) {
+                if (i < rating) {
+                    stars += '<i class="fa-solid fa-star"></i>';
+                } else {
+                    stars += '<i class="fa-regular fa-star"></i>';
+                }
+            }
+            return stars;
+        }
+
+        function handleRequestSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(() => {
+                closeBookModal();
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Share Reads</title>
+    <script src="https://kit.fontawesome.com/b795da5b50.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/dashboard-modern.css">
+    <link rel="icon" href="images/book.png" type="image/png">
+    <style>
+        .notifications-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 32px 80px;
+        }
+        
+        .notification-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(139, 127, 199, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .notification-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(139, 127, 199, 0.18);
+        }
+        
+        .notification-card.accepted {
+            border-left: 4px solid #8b7fc7;
+        }
+        
+        .notification-card.request {
+            border-left: 4px solid #ffb7d5;
+        }
+        
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(139, 127, 199, 0.1);
+        }
+        
+        .notification-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+        
+        .notification-icon.accepted {
+            background: linear-gradient(135deg, #8b7fc7 0%, #a89fd9 100%);
+        }
+        
+        .notification-icon.request {
+            background: linear-gradient(135deg, #ffb7d5 0%, #ff9a9e 100%);
+        }
+        
+        .notification-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #4a4a68;
+        }
+        
+        .notification-body {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+        
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(139, 127, 199, 0.2);
+            flex-shrink: 0;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-text {
+            color: #8e8ea7;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+        
+        .notification-text h4 {
+            display: inline;
+            color: #4a4a68;
+            font-weight: 600;
+            font-size: inherit;
+        }
+        
+        .notification-time {
+            font-size: 13px;
+            color: #b4b4c8;
+            font-style: italic;
+            margin-top: 12px;
+        }
+        
+        .notification-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .btn-accept {
+            flex: 1;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #8b7fc7 0%, #a89fd9 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(139, 127, 199, 0.25);
+        }
+        
+        .btn-accept:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(139, 127, 199, 0.35);
+        }
+        
+        .btn-cancel, .btn-delete {
+            flex: 1;
+            padding: 12px 24px;
+            background: white;
+            color: #ff9a9e;
+            border: 2px solid #ff9a9e;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-cancel:hover, .btn-delete:hover {
+            background: rgba(255, 154, 158, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .btn-delete {
+            flex: initial;
+        }
+        
+        @media (max-width: 768px) {
+            .notification-body {
+                flex-direction: column;
+            }
+            
+            .notification-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Modern Navigation Header -->
+    <header class="modern-header">
+        <nav class="nav-container">
+            <a href="/dashboard" class="nav-logo">
+                <img src="images/Share Reads .png" alt="Share Reads Logo">
+            </a>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="/dashboard"><i class="fa-solid fa-home"></i> Home</a></li>
+                <li><a href="/profileInfo"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li><a href="/booklist"><i class="fa-solid fa-book"></i> My Books</a></li>
+                <li>
+                    <a href="/notifications" class="active">
+                        <i class="fa-solid fa-bell"></i> Notifications
+                        <% if (unreadCount > 0) { %>
+                            <span class="notification-badge"><%= unreadCount %></span>
+                        <% } %>
+                    </a>
+                </li>
+                <li><a href="/" style="color: #ff9a9e;"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="dashboard-hero">
+        <div class="hero-badge">
+            <i class="fa-solid fa-bell"></i> Notifications
+        </div>
+        <h1 class="hero-title">Your Notifications</h1>
+        <p class="hero-subtitle">Stay updated with your book requests</p>
+    </section>
+
+    <!-- Notifications Content -->
+    <% if (notifications.length === 0) { %>
+        <section class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fa-solid fa-bell-slash"></i>
+            </div>
+            <h2 class="empty-state-title">No notifications yet</h2>
+            <p class="empty-state-text">You'll see notifications here when someone requests your books or responds to your requests</p>
+        </section>
+    <% } else { %>
+
+        <section class="notifications-container">
+            <% notifications.forEach(notification => { %>
+                <% if(notification.status === 'accepted') { %>
+                    <!-- Accepted Request Notification -->
+                    <div class="notification-card accepted">
+                        <div class="notification-header">
+                            <div class="notification-icon accepted">
+                                <i class="fa-solid fa-check-circle"></i>
+                            </div>
+                            <div class="notification-title">🎉 Congratulations!</div>
+                        </div>
+                        
+                        <div class="notification-body">
+                            <% if (typeof notification.fromUser.profileImage != "undefined") { %>
+                                <img src="<%= notification.fromUser.profileImage %>" alt="User" class="user-avatar">
+                            <% } else { %>
+                                <img src="images/user.png" alt="User" class="user-avatar">
+                            <% } %>
+                            
+                            <div class="notification-content">
+                                <div class="notification-text">
+                                    Your request for <h4><%= notification.book.title %></h4> was accepted by <h4><%= notification.fromUser.name %></h4>
+                                </div>
+                                
+                                <p style="background: rgba(139, 127, 199, 0.08); padding: 12px 16px; border-radius: 8px; color: #8b7fc7; font-size: 14px; margin-top: 12px;">
+                                    <i class="fa-solid fa-envelope"></i> Please check your email for the contact information.
+                                </p>
+                                
+                                <div class="notification-time">
+                                    <i class="fa-regular fa-clock"></i> Received <%= notification.formattedTime %>
+                                </div>
+                                
+                                <form action="/notifications" method="post" class="notification-actions">
+                                    <input type="hidden" name="notificationId" value="<%= notification._id %>">
+                                    <button type="submit" name="action" value="cancel" class="btn-delete">
+                                        <i class="fa-solid fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <!-- Pending Request Notification -->
+                    <div class="notification-card request">
+                        <div class="notification-header">
+                            <div class="notification-icon request">
+                                <i class="fa-solid fa-book-open"></i>
+                            </div>
+                            <div class="notification-title">📚 Book Request</div>
+                        </div>
+                        
+                        <div class="notification-body">
+                            <% if (typeof notification.fromUser.profileImage != "undefined") { %>
+                                <img src="<%= notification.fromUser.profileImage %>" alt="User" class="user-avatar">
+                            <% } else { %>
+                                <img src="images/user.png" alt="User" class="user-avatar">
+                            <% } %>
+                            
+                            <div class="notification-content">
+                                <div class="notification-text">
+                                    <h4><%= notification.fromUser.name %></h4> from <h4><%= notification.fromUser.address %></h4> wants to borrow your book <h4><%= notification.book.title %></h4>
+                                </div>
+                                
+                                <p style="background: rgba(255, 183, 213, 0.1); padding: 12px 16px; border-radius: 8px; color: #8e8ea7; font-size: 14px; margin-top: 12px;">
+                                    <i class="fa-solid fa-info-circle"></i> If you accept this request, we will email them your contact information.
+                                </p>
+                                
+                                <div class="notification-time">
+                                    <i class="fa-regular fa-clock"></i> Received <%= notification.formattedTime %>
+                                </div>
+                                
+                                <form action="/notifications" method="post" class="notification-actions">
+                                    <input type="hidden" name="notificationId" value="<%= notification._id %>">
+                                    <button type="submit" name="action" value="accept" class="btn-accept">
+                                        <i class="fa-solid fa-check"></i> Accept Request
+                                    </button>
+                                    <button type="submit" name="action" value="cancel" class="btn-cancel">
+                                        <i class="fa-solid fa-times"></i> Decline
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            <% }) %>
+        </section>
+    <% } %>
+
+    <%- include('partials/modern-footer') %>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu').addEventListener('click', function () {
+            this.classList.toggle('active');
+            document.getElementById('nav-menu').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

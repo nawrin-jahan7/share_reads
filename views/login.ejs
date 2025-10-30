@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Share Reads</title>
+    <script src="https://kit.fontawesome.com/b795da5b50.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/auth-modern.css">
+    <link rel="icon" href="images/book.png" type="image/png">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <img src="images/Share Reads .png" alt="Share Reads Logo">
+            </div>
+            
+            <h1 class="auth-title">Welcome Back!</h1>
+            <p class="auth-subtitle">Login to continue sharing and discovering books</p>
+
+            <% if (typeof errorMessage != "undefined") { %>
+                <div class="error-message">
+                    <i class="fa-solid fa-circle-exclamation"></i> <%= errorMessage %>
+                </div>
+            <% } %>
+            
+            <form class="auth-form" action="/login" method="post">
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <span class="input-icon">
+                            <i class="fa-solid fa-envelope"></i>
+                        </span>
+                        <input type="email" class="form-input" placeholder="Email address" name="username" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <span class="input-icon">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input type="password" class="form-input" placeholder="Password" name="password" required>
+                    </div>
+                    <a href="forgotPassword" class="form-link">Forgot password?</a>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn-auth btn-primary">
+                        <i class="fa-solid fa-sign-in-alt"></i> Login
+                    </button>
+                </div>
+            </form>
+
+            <div class="auth-footer">
+                Don't have an account? <a href="signup">Sign Up</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

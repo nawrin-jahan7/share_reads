@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Share Reads</title>
+    <script src="https://kit.fontawesome.com/b795da5b50.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/auth-modern.css">
+    <link rel="icon" href="images/book.png" type="image/png">
+    <style>
+        .profile-container {
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .profile-card {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .profile-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .profile-image-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 16px;
+        }
+        
+        .profile-image {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .profile-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+        
+        .delete-photo-btn {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+        
+        .delete-photo-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <h1 class="auth-title" style="color: white; -webkit-text-fill-color: white;">Create Your Profile</h1>
+                
+                <div class="profile-image-wrapper">
+                    <% if (typeof userImage != "undefined") { %>
+                        <img src="<%= userImage %>" alt="Profile Picture" class="profile-image">
+                    <% } else { %>
+                        <img src="images/user.png" alt="Profile Picture" class="profile-image">
+                    <% } %>
+                </div>
+                
+                <% if (typeof userName != "undefined") { %>
+                    <h2 class="profile-name"><%= userName %></h2>
+                <% } %>
+                
+                <form action="/deletePhoto" method="POST">
+                    <button type="submit" class="delete-photo-btn">
+                        <i class="fa-solid fa-trash"></i> Remove Photo
+                    </button>
+                </form>
+            </div>
+
+            <div class="auth-card">
+                <form action="/profile" method="post" enctype="multipart/form-data" class="auth-form">
+
+                    <div class="form-group">
+                        <label for="profileImage" class="form-label">
+                            <i class="fa-solid fa-camera"></i> Profile Image
+                        </label>
+                        <div class="file-input-wrapper">
+                            <input type="file" name="profileImage" id="profileImage" accept="image/*">
+                            <label for="profileImage" class="file-input-label" style="margin: 0;">
+                                <i class="fa-solid fa-cloud-upload-alt"></i>
+                                <span>Choose a profile photo</span>
+                            </label>
+                        </div>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="address" class="form-label">
+                            <i class="fa-solid fa-location-dot"></i> Address
+                        </label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">
+                                <i class="fa-solid fa-map-marker-alt"></i>
+                            </span>
+                            <input type="text" class="form-input" name="address" id="address" placeholder="Enter your address" value="<%= userAddress %>" required>
+                        </div>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="phone" class="form-label">
+                            <i class="fa-solid fa-phone"></i> Phone Number
+                        </label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">
+                                <i class="fa-solid fa-mobile-alt"></i>
+                            </span>
+                            <input type="text" class="form-input" name="phone" id="phone" placeholder="Enter phone number" value="<%= userPhone %>" required>
+                        </div>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="division" class="form-label">
+                            <i class="fa-solid fa-map"></i> Division
+                        </label>
+                        <div class="input-wrapper" style="padding: 0;">
+                            <select class="form-input" id="division" name="division" required style="width: 100%;">
+                                <option value="">Choose your division...</option>
+                                <option value="Dhaka" <%= userDivision === 'Dhaka' ? 'selected' : '' %>>Dhaka</option>
+                                <option value="Rajshai" <%= userDivision === 'Rajshai' ? 'selected' : '' %>>Rajshai</option>
+                                <option value="Chattogram" <%= userDivision === 'Chattogram' ? 'selected' : '' %>>Chattogram</option>
+                                <option value="Barishal" <%= userDivision === 'Barishal' ? 'selected' : '' %>>Barishal</option>
+                                <option value="Rangpur" <%= userDivision === 'Rangpur' ? 'selected' : '' %>>Rangpur</option>
+                                <option value="Khulna" <%= userDivision === 'Khulna' ? 'selected' : '' %>>Khulna</option>
+                                <option value="Mymensingh" <%= userDivision === 'Mymensingh' ? 'selected' : '' %>>Mymensingh</option>
+                                <option value="Sylhet" <%= userDivision === 'Sylhet' ? 'selected' : '' %>>Sylhet</option>
+                            </select>
+                        </div>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="gender" class="form-label">
+                            <i class="fa-solid fa-venus-mars"></i> Gender
+                        </label>
+                        <div class="input-wrapper" style="padding: 0;">
+                            <select class="form-input" id="gender" name="gender" required style="width: 100%;">
+                                <option value="">Choose your gender...</option>
+                                <option value="Male" <%= userGender === 'Male' ? 'selected' : '' %>>Male</option>
+                                <option value="Female" <%= userGender === 'Female' ? 'selected' : '' %>>Female</option>
+                                <option value="Other" <%= userGender === 'Other' ? 'selected' : '' %>>Other</option>
+                            </select>
+                        </div>
+                    </div>
+    
+                    <div class="btn-group">
+                        <button type="submit" class="btn-auth btn-primary" style="flex: 1;">
+                            <i class="fa-solid fa-check-circle"></i> Save Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // File input preview
+        document.getElementById('profileImage').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                const label = this.nextElementSibling;
+                label.querySelector('span').textContent = fileName;
+            }
+        });
+    </script>
+</body>
+</html>

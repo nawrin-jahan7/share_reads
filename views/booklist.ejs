@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Books - Share Reads</title>
+    <script src="https://kit.fontawesome.com/b795da5b50.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/dashboard-modern.css">
+    <link rel="icon" href="images/book.png" type="image/png">
+    <style>
+        .add-book-section {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 32px;
+        }
+        
+        .add-book-card {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .add-book-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4a4a68;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-input, .form-textarea, .form-select {
+            padding: 14px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #8b7fc7;
+            box-shadow: 0 0 0 4px rgba(139, 127, 199, 0.15);
+            background: white;
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-select {
+            cursor: pointer;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 14px 20px;
+            background: #f8f9fa;
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #718096;
+            font-weight: 500;
+        }
+        
+        .file-input-label:hover {
+            border-color: #8b7fc7;
+            background: rgba(139, 127, 199, 0.08);
+            color: #8b7fc7;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #8b7fc7 0%, #a89fd9 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 16px;
+            box-shadow: 0 8px 20px rgba(139, 127, 199, 0.25);
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(139, 127, 199, 0.35);
+        }
+        
+        .btn-delete {
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #ffb7d5 0%, #ff9a9e 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+        }
+        
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 154, 158, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .add-book-card {
+                padding: 32px 24px;
+            }
+            
+            .add-book-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Modern Navigation Header -->
+    <header class="modern-header">
+        <nav class="nav-container">
+            <a href="/dashboard" class="nav-logo">
+                <img src="images/Share Reads .png" alt="Share Reads Logo">
+            </a>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="/dashboard"><i class="fa-solid fa-home"></i> Home</a></li>
+                <li><a href="/profileInfo"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li><a href="/booklist" class="active"><i class="fa-solid fa-book"></i> My Books</a></li>
+                <li>
+                    <a href="/notifications">
+                        <i class="fa-solid fa-bell"></i> Notifications
+                        <% if (unreadCount > 0) { %>
+                            <span class="notification-badge"><%= unreadCount %></span>
+                        <% } %>
+                    </a>
+                </li>
+                <li><a href="/" style="color: #f5576c;"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="dashboard-hero">
+        <div class="hero-badge">
+            <i class="fa-solid fa-book"></i> My Book Collection
+        </div>
+        <h1 class="hero-title">Your Book List</h1>
+        <p class="hero-subtitle">Manage and share your personal book collection</p>
+    </section>
+
+    <!-- Books Section -->
+    <% if (books.length === 0) { %>
+        <section class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fa-solid fa-book-open"></i>
+            </div>
+            <h2 class="empty-state-title">No books yet</h2>
+            <p class="empty-state-text">Add your first book to start sharing with the community!</p>
+        </section>
+    <% } else { %>
+    <section class="books-section">
+        <div class="books-grid">
+            <% books.forEach(book => { %>
+                <div class="book-card">
+                    <div class="book-card-image-wrapper">
+                        <img src="<%= book.bookImage %>" alt="<%= book.title %>" class="book-card-image">
+                        <div class="book-card-badge">
+                            <i class="fa-solid fa-star"></i> <%= book.rating %>/5
+                        </div>
+                    </div>
+                    <div class="book-card-content">
+                        <h2 class="book-card-title"><%= book.title %></h2>
+                        <p class="book-card-author">by <%= book.author %></p>
+                        
+                        <div class="book-card-details">
+                            <div class="book-card-detail">
+                                <i class="fa-solid fa-comment"></i>
+                                <span style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"><%= book.review %></span>
+                            </div>
+                        </div>
+
+                        <form action="/deleteBook" method="POST">
+                            <input type="hidden" name="bookId" value="<%= book._id %>">
+                            <button type="submit" class="btn-delete">
+                                <i class="fa-solid fa-trash"></i> Delete Book
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </section>
+    <% } %>
+
+    <!-- Add New Book Section -->
+    <section class="add-book-section">
+        <div class="add-book-card">
+            <h2 class="add-book-title">
+                <i class="fa-solid fa-plus-circle"></i> Add a New Book
+            </h2>
+            
+            <form action="/addBook" method="post" enctype="multipart/form-data">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="title" class="form-label">
+                            <i class="fa-solid fa-book"></i> Book Title
+                        </label>
+                        <input type="text" id="title" name="title" class="form-input" placeholder="Enter book title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="author" class="form-label">
+                            <i class="fa-solid fa-pen"></i> Author
+                        </label>
+                        <input type="text" id="author" name="author" class="form-input" placeholder="Enter author name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="review" class="form-label">
+                            <i class="fa-solid fa-comment"></i> Review
+                        </label>
+                        <textarea id="review" name="review" class="form-textarea" placeholder="Share your thoughts about this book..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rating" class="form-label">
+                            <i class="fa-solid fa-star"></i> Rating (1-5)
+                        </label>
+                        <input type="number" id="rating" name="rating" class="form-input" min="1" max="5" placeholder="Rate the book" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fa-solid fa-image"></i> Book Cover Image
+                        </label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="bookImage" name="bookImage" accept="image/*" required>
+                            <label for="bookImage" class="file-input-label">
+                                <i class="fa-solid fa-cloud-upload-alt"></i>
+                                <span>Choose an image or drag it here</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">
+                        <i class="fa-solid fa-check-circle"></i> Add Book to Collection
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <%- include('partials/modern-footer') %>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu').addEventListener('click', function () {
+            this.classList.toggle('active');
+            document.getElementById('nav-menu').classList.toggle('active');
+        });
+        
+        // File input preview
+        document.getElementById('bookImage').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                const label = this.nextElementSibling;
+                label.querySelector('span').textContent = fileName;
+            }
+        });
+    </script>
+</body>
+</html>

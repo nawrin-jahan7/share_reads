@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Sent Requests | Share Reads</title>
+    <link rel="stylesheet" href="/css/dashboard-modern.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="/images/book.png" type="image/png">
+</head>
+<body>
+    <!-- Modern Header -->
+    <header class="modern-header">
+        <nav class="nav-container">
+            <div class="logo">
+                <i class="fa-solid fa-book-open"></i>
+                <span><a href="/dashboard">Share Reads</a></span>
+            </div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="/dashboard"><i class="fa-solid fa-home"></i> Dashboard</a></li>
+                <li><a href="/booklist"><i class="fa-solid fa-book"></i> My Books</a></li>
+                <li><a href="/search"><i class="fa-solid fa-magnifying-glass"></i> Search</a></li>
+                <li><a href="/profileInfo"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li><a href="/viewSentRequest" class="active"><i class="fa-solid fa-paper-plane"></i> Requests</a></li>
+                <li><a href="/notifications"><i class="fa-solid fa-bell"></i> Notifications</a></li>
+                <li><a href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a></li>
+            </ul>
+            <div class="mobile-menu" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section" style="padding: 40px 20px;">
+        <div class="hero-badge">
+            <i class="fa-solid fa-paper-plane"></i> SENT REQUESTS
+        </div>
+        <h1 class="hero-title">My Sent Requests</h1>
+        <p class="hero-subtitle">Track all your book borrowing requests</p>
+        <a href="/profileInfo" style="display: inline-block; margin-top: 15px; color: #8b7fc7; text-decoration: none; font-weight: 500;">
+            <i class="fa-solid fa-arrow-left"></i> Back to Profile
+        </a>
+    </section>
+
+    <!-- Requests Section -->
+    <% if (requests.length === 0) { %>
+        <section class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fa-solid fa-paper-plane"></i>
+            </div>
+            <h2 class="empty-state-title">No sent requests</h2>
+            <p class="empty-state-text">You haven't sent any book requests yet. Browse books and request to borrow!</p>
+            <a href="/dashboard" class="btn-view" style="display: inline-block; margin-top: 20px;">
+                <i class="fa-solid fa-magnifying-glass"></i> Browse Books
+            </a>
+        </section>
+    <% } else { %>
+        <section class="requests-section" style="padding: 40px 20px 80px;">
+            <div class="requests-container">
+                <% requests.forEach(request => { %>
+                    <div class="request-card-modern">
+                        <div class="request-card-header">
+                            <div class="request-user-section">
+                                <div class="request-avatar">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                <div class="request-user-details">
+                                    <h3 class="request-user-name"><%= request.toUser.name %></h3>
+                                    <p class="request-time">
+                                        <i class="fa-solid fa-clock"></i> <%= request.formattedTime %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="request-status-badge <%= request.status === 'accepted' ? 'status-accepted' : request.status === 'declined' ? 'status-declined' : 'status-pending' %>">
+                                <% if (request.status === 'accepted') { %>
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span>Accepted</span>
+                                <% } else if (request.status === 'declined') { %>
+                                    <i class="fa-solid fa-circle-xmark"></i>
+                                    <span>Declined</span>
+                                <% } else { %>
+                                    <i class="fa-solid fa-clock"></i>
+                                    <span>Pending</span>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <div class="request-card-body">
+                            <div class="request-info-grid">
+                                <div class="request-info-item">
+                                    <div class="request-info-icon">
+                                        <i class="fa-solid fa-book"></i>
+                                    </div>
+                                    <div class="request-info-content">
+                                        <span class="request-info-label">Book Title</span>
+                                        <span class="request-info-value"><%= request.book.title %></span>
+                                    </div>
+                                </div>
+
+                                <div class="request-info-item">
+                                    <div class="request-info-icon">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                    </div>
+                                    <div class="request-info-content">
+                                        <span class="request-info-label">Owner Location</span>
+                                        <span class="request-info-value"><%= request.toUser.address %></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <% if (request.status === 'pending') { %>
+                                <form action="/cancelRequest" method="POST" class="request-action-form">
+                                    <input type="hidden" name="requestId" value="<%= request._id %>">
+                                    <button type="submit" class="btn-cancel-request">
+                                        <i class="fa-solid fa-xmark"></i>
+                                        Cancel Request
+                                    </button>
+                                </form>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+    <% } %>
+
+    <%- include('partials/modern-footer') %>
+
+    <style>
+        .requests-container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            gap: 24px;
+        }
+
+        .request-card-modern {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 8px 32px rgba(139, 127, 199, 0.15);
+            border: 1px solid rgba(139, 127, 199, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .request-card-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(135deg, #8b7fc7 0%, #a89fd9 100%);
+        }
+
+        .request-card-modern:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 48px rgba(139, 127, 199, 0.25);
+        }
+
+        .request-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .request-user-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .request-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #8b7fc7 0%, #a89fd9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 16px rgba(139, 127, 199, 0.3);
+        }
+
+        .request-user-details {
+            flex: 1;
+        }
+
+        .request-user-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d3748;
+            margin: 0 0 6px 0;
+        }
+
+        .request-time {
+            font-size: 14px;
+            color: #718096;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .request-status-badge {
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        
+        .status-pending {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #8b4513;
+            box-shadow: 0 4px 12px rgba(252, 182, 159, 0.3);
+        }
+        
+        .status-accepted {
+            background: linear-gradient(135deg, #a8edea 0%, #c3f7ee 100%);
+            color: #0d5a3d;
+            box-shadow: 0 4px 12px rgba(168, 237, 234, 0.4);
+        }
+        
+        .status-declined {
+            background: linear-gradient(135deg, #ffd4d4 0%, #ff9a9e 100%);
+            color: #8b1538;
+            box-shadow: 0 4px 12px rgba(255, 154, 158, 0.3);
+        }
+
+        .request-card-body {
+            display: grid;
+            gap: 20px;
+        }
+
+        .request-info-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .request-info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(255, 236, 210, 0.3) 0%, rgba(212, 165, 217, 0.2) 100%);
+            border-radius: 14px;
+            border: 1px solid rgba(139, 127, 199, 0.1);
+        }
+
+        .request-info-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #8b7fc7 0%, #a89fd9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(139, 127, 199, 0.25);
+        }
+
+        .request-info-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .request-info-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #8b7fc7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .request-info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            line-height: 1.4;
+        }
+
+        .request-action-form {
+            margin-top: 4px;
+        }
+
+        .btn-cancel-request {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #ffd4d4 100%);
+            color: #8b1538;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(255, 154, 158, 0.3);
+        }
+
+        .btn-cancel-request:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 154, 158, 0.4);
+            background: linear-gradient(135deg, #ff8a8e 0%, #ffc4c4 100%);
+        }
+
+        .btn-cancel-request i {
+            font-size: 16px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .requests-container {
+                padding: 0 16px;
+            }
+
+            .request-card-modern {
+                padding: 20px;
+            }
+
+            .request-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .request-status-badge {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .request-user-name {
+                font-size: 16px;
+            }
+
+            .request-info-value {
+                font-size: 14px;
+            }
+        }
+    </style>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu').addEventListener('click', function () {
+            this.classList.toggle('active');
+            document.getElementById('nav-menu').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

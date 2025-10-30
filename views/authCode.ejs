@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Reads</title>
+    <script src="https://kit.fontawesome.com/b795da5b50.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/style8.css">
+    <link rel="icon" href="images/book.png" type="image/png">
+</head>
+
+<div class="container">
+
+    <div class="form-box">
+        <h1 id="title">Verification code send on your email</h1>
+
+        <% if (typeof errorMessage != "undefined") { %>
+            <div class="error-message" style="color: red;">
+                <%= errorMessage %>
+            </div>
+        <% } %>
+        
+        <form id="form" action="/authCode" method="post">
+            <div class="input-group">
+                <div class="input-field" id="nameField">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" placeholder="Enter Code" id="codeInput" name="code" required>
+                </div>
+            </div>
+
+            <div class="btn-field">
+                <button type="submit">Continue</button>
+            </div>
+        
+        </form>
+    </div> 
+</div>
+
+</body>
+</html>

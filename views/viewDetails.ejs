@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Details - Share Reads</title>
+    <script src="https://kit.fontawesome.com/b795da5b50.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/dashboard-modern.css">
+    <link rel="icon" href="images/book.png" type="image/png">
+    <style>
+        .details-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 32px 80px;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+        
+        .details-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 8px 32px rgba(139, 127, 199, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .owner-section {
+            text-align: center;
+        }
+        
+        .owner-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 24px;
+            border: 4px solid rgba(139, 127, 199, 0.2);
+            box-shadow: 0 8px 24px rgba(139, 127, 199, 0.2);
+        }
+        
+        .owner-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4a4a68;
+            margin-bottom: 16px;
+        }
+        
+        .owner-detail {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            color: #8e8ea7;
+            font-size: 15px;
+        }
+        
+        .owner-detail i {
+            color: #8b7fc7;
+            width: 20px;
+        }
+        
+        .book-section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4a4a68;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .review-box {
+            background: rgba(139, 127, 199, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            line-height: 1.8;
+            color: #8e8ea7;
+        }
+        
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 24px;
+            color: #8b7fc7;
+        }
+        
+        .rating-stars {
+            color: #ffb7d5;
+        }
+        
+        .btn-request {
+            width: 100%;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #8b7fc7 0%, #a89fd9 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+            box-shadow: 0 8px 20px rgba(139, 127, 199, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-request:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(139, 127, 199, 0.35);
+        }
+        
+        .btn-request.cancel {
+            background: linear-gradient(135deg, #ffb7d5 0%, #ff9a9e 100%);
+            box-shadow: 0 8px 20px rgba(255, 154, 158, 0.25);
+        }
+        
+        .btn-request.cancel:hover {
+            box-shadow: 0 12px 28px rgba(255, 154, 158, 0.35);
+        }
+        
+        @media (max-width: 768px) {
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .details-card {
+                padding: 32px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Modern Navigation Header -->
+    <header class="modern-header">
+        <nav class="nav-container">
+            <a href="/dashboard" class="nav-logo">
+                <img src="images/Share Reads .png" alt="Share Reads Logo">
+            </a>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="/dashboard"><i class="fa-solid fa-home"></i> Home</a></li>
+                <li><a href="/profileInfo"><i class="fa-solid fa-user"></i> Profile</a></li>
+                <li><a href="/booklist"><i class="fa-solid fa-book"></i> My Books</a></li>
+                <li><a href="/notifications"><i class="fa-solid fa-bell"></i> Notifications</a></li>
+                <li><a href="/" style="color: #ff9a9e;"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="dashboard-hero">
+        <div class="hero-badge">
+            <i class="fa-solid fa-book-open"></i> Book Details
+        </div>
+        <h1 class="hero-title"><%= book.title %></h1>
+        <p class="hero-subtitle">by <%= book.author %></p>
+    </section>
+    
+    <!-- Details Content -->
+    <section class="details-container">
+        <div class="details-grid">
+            <!-- Owner Information -->
+            <div class="details-card owner-section">
+                <% if(typeof user.profileImage != "undefined") { %>
+                    <img src="<%= user.profileImage %>" alt="<%= user.name %>" class="owner-image">
+                <% } else { %>
+                    <img src="images/user.png" alt="<%= user.name %>" class="owner-image">
+                <% } %>
+
+                <h2 class="owner-name"><%= user.name %></h2>
+                
+                <div class="owner-detail">
+                    <i class="fa-solid fa-map"></i>
+                    <span><%= user.division %></span>
+                </div>
+                
+                <div class="owner-detail">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span><%= user.address %></span>
+                </div>
+
+                <div style="margin-top: 24px; padding: 20px; background: linear-gradient(135deg, rgba(255, 236, 210, 0.5) 0%, rgba(212, 165, 217, 0.3) 100%); border-radius: 16px; border: 2px dashed rgba(139, 127, 199, 0.3);">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; color: #8b7fc7; font-weight: 600; font-size: 14px;">
+                        <i class="fa-solid fa-info-circle" style="font-size: 18px;"></i>
+                        <p style="margin: 0; text-align: center; line-height: 1.6;">
+                            Send request to get contact info<br>(Email & Phone)
+                        </p>
+                    </div>
+                </div>
+
+                <form action="/sendRequest" method="POST" style="margin-top: 24px;">
+                    <input type="hidden" name="toUserId" value="<%= user._id %>">
+                    <input type="hidden" name="bookId" value="<%= book._id %>">
+                    <button id="requestButton" type="submit" class="btn-request <%= requestExists ? 'cancel' : '' %>">
+                        <% if (requestExists) { %>
+                            <i class="fa-solid fa-times"></i> Cancel Request
+                        <% } else { %>
+                            <i class="fa-solid fa-paper-plane"></i> Send Request
+                        <% } %>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Book Information -->
+            <div class="details-card book-section">
+                <h2>
+                    <i class="fa-solid fa-comment-dots"></i> Review
+                </h2>
+                <div class="review-box">
+                    <%= book.review %>
+                </div>
+                
+                <h2>
+                    <i class="fa-solid fa-star"></i> Rating
+                </h2>
+                <div class="rating-display">
+                    <span class="rating-stars">
+                        <% for(let i = 0; i < book.rating; i++) { %>
+                            <i class="fa-solid fa-star"></i>
+                        <% } %>
+                        <% for(let i = book.rating; i < 5; i++) { %>
+                            <i class="fa-regular fa-star"></i>
+                        <% } %>
+                    </span>
+                    <span style="color: #4a4a68; font-weight: 700;"><%= book.rating %> / 5</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('partials/modern-footer') %>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu').addEventListener('click', function () {
+            this.classList.toggle('active');
+            document.getElementById('nav-menu').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
